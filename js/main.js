@@ -1,20 +1,122 @@
-<HTML>
-<HEAD>
-<TITLE>MOVEMENT</TITLE>
-<STYLE type="text/css">
-#space{position:absolute;left:0px; top:275px}
-#inSpace{position:absolute; background-color:#FFFFFF; left:600px; top:275px; width:100px; height:600px; overflow:auto}
-</STYLE>
-<SCRIPT type="text/javascript" language="javascript">
+var KeyController = Backbone.Model.extend({
+    defaults: {
+    },
+    /**
+     * Subscribes to events from that keyboard
+     */
+    useKeyboard : function(){
+    }
+});
+
+/**
+ * A game screen super-class
+ * 
+ * should perform most of the functionality for displaying things on screen
+ */
+var Screen = Backbone.Model.extend({
+    defaults: function()
+    {
+        var ret = {
+            controller: new Keyboard()
+        };
+        return ret;
+    },
+    initialize: function()
+    {
+        this.down = this.trigger.bind(this, "keydown");
+        this.up = this.trigger.bind(this, "keyup");
+    },
+    draw: function()
+    {
+    },
+    open: function(ctx){
+        this.trigger("open");
+        
+        ctx.canvas.addEventListener("keydown", 
+            this.down, false);
+        
+        ctx.canvas.addEventListener("keyup", 
+            this.up, false);
+        
+        this.on("keydown", this.setKey, this);
+        this.on("keyup", this.unsetKey, this);
+    },
+    close: function(){
+        this.trigger("close");
+        ctx.canvas.removeEventListener("keydown", this.down, false);
+        ctx.canvas.removeEventListener("keyup", this.up, false);
+    },
+    setKey: function(e){
+        var keyState = this.get("key");
+        keyState[e.keyCode] = true;
+        this.set(keyState);
+    },
+    unsetKey: function(e){
+        var keyState = this.get("key");
+        keySate[e.keyCode] = false;
+        this.set(keyState);
+    },
+    /**
+     * Subscribes to events on a given controller
+     */
+    useController: function(){
+    }
+});
+
+var ConfigurationScreen = Screen.extend({
+    initialize: function(){
+        // Generate a 
+    },
+    open: function(ctx)
+    {
+        Screen.prototype.open.apply(this, arguments);
+    },
+    getMessages: function(){
+    }
+});
+
+var Message = Backbone.Model.extend({
+    defaults: {
+        "message": "Missing message"
+    }
+});
+
+var ConfigurationMessages = Backbone.Model.extend({
+    model: Message
+});
+
+var Car = Backbone.Model.extend({
+
+});
+
+/**
+ * A full game stage
+ * 
+ * should trigger a 
+ */
+var Stage = Backbone.Model.extend({
+    initialize: function(){},
+    surfaces: function(){}
+});
+
+/**
+ * Surfaces that the car can rest upon
+ */
+var Surface = Backbone.Model.extend({
+
+});
+
 var inputpoint=0;
 var AJAXvar="";
 var ctrls=new Array(4);
 var keys=new Array(4);
+
 var message=new Array(4);
 message[0]="press the key for up";
 message[1]="press the key for down";
 message[2]="press the key for left";
 message[3]="press the key for right";
+
 var onSurface=true;
 var speedx=0;
 var speedy=0;
@@ -56,23 +158,47 @@ var surfaceNum;
 var planeNum;
 var pointNum;
 var turn=5;
-function point3D(x,y,z){
-this.x=x;
-this.y=y;
-this.z=z;
+
+function point3D(x, y, z){
+    this.x = x;
+    this.y = y;
+    this.z = z;
 }
 
-function surface(x,z,y,width,depth,slopex,slopez,id){//p1 is the lesser point, p2 is the greater point
+//p1 is the lesser point, p2 is the greater point
+function surface(x,z,y,width,depth,slopex,slopez,id){
 this.active=true;
 this.slopeX=slopex;
 this.slopeZ=slopez;
 this.width=width;
 this.depth=depth;
 this.point=new Array(4);
-this.point[0]=new point3D(x,y,z);
-this.point[1]=new point3D(x+width,y+width*slopex,z);
-this.point[2]=new point3D(x+width,y+width*slopex+depth*slopez,z+depth);
-this.point[3]=new point3D(x,y+depth*slopez,z+depth);
+/*
+this.point = [
+    new Vertex({
+        "x": x, 
+        "y": y, 
+        "z": z}),
+    new Vertex({
+        "x": x + width, 
+        "y": y + width * slopex, 
+        "z": z}),
+    new Vertex({
+        "x": x + width, 
+        "y": y + width * slopex + depth * slopez, 
+        "z": z + depth}),
+    new Vertex({
+        "x": x, 
+        "y": y + depth * slopez, 
+        "z": z + depth})
+];
+*/
+this.point = [
+    new point3D(x, y, z),
+    new point3D(x + width, y + width * slopex, z),
+    new point3D(x + width, y + width * slopex + depth * slopez, z + depth),
+    new point3D(x, y + depth * slopez, z + depth)
+];
 this.id=id;
 this.touched=false;
 }
@@ -347,6 +473,7 @@ init();
 }
 //other setup actions
 }
+window.addEventListener("load", setup, false);
 
 function init3D(){
 document.onkeydown=function(e){
@@ -479,12 +606,3 @@ field.stroke();
 }}
 return 0;
 }
-</SCRIPT>
-</HEAD>
-<body bgcolor="#000000" onLoad="setup();">
-<CANVAS width="600" height="600" id="space" style="cursor:none">
-Update Firefox
-</CANVAS>
-
-</body>
-</HTML>
