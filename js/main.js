@@ -106,179 +106,162 @@ function point3D(x, y, z){
 
 //p1 is the lesser point, p2 is the greater point
 function surface(x,z,y,width,depth,slopex,slopez,id){
-this.active=true;
-this.slopeX=slopex;
-this.slopeZ=slopez;
-this.width=width;
-this.depth=depth;
-this.point=new Array(4);
-/*
-this.point = [
-    new Vertex({
-        "x": x, 
-        "y": y, 
-        "z": z}),
-    new Vertex({
-        "x": x + width, 
-        "y": y + width * slopex, 
-        "z": z}),
-    new Vertex({
-        "x": x + width, 
-        "y": y + width * slopex + depth * slopez, 
-        "z": z + depth}),
-    new Vertex({
-        "x": x, 
-        "y": y + depth * slopez, 
-        "z": z + depth})
-];
-*/
-this.point = [
-    new point3D(x, y, z),
-    new point3D(x + width, y + width * slopex, z),
-    new point3D(x + width, y + width * slopex + depth * slopez, z + depth),
-    new point3D(x, y + depth * slopez, z + depth)
-];
-this.id=id;
-this.touched=false;
+    this.active=true;
+    this.slopeX=slopex;
+    this.slopeZ=slopez;
+    this.width=width;
+    this.depth=depth;
+    this.point=new Array(4);
+    this.point = [
+        new point3D(x, y, z),
+        new point3D(x + width, y + width * slopex, z),
+        new point3D(x + width, y + width * slopex + depth * slopez, z + depth),
+        new point3D(x, y + depth * slopez, z + depth)
+    ];
+    this.id=id;
+    this.touched=false;
 }
 
 function surfaceToPlane(context,a,color,tag){
-a.id=tag;
-var c;
-for(c=0;c<a.point.length;c++){
-pointArr.push(a.point[c]);
-pointVis.push(adjustPoint(pointArr[pointNum]));
-pointNum++;
-}
-planeArr.push(new formList(context,color,tag));
-planeArr[planeNum].addPoint(pointNum-1);
-planeArr[planeNum].addPoint(pointNum-2);
-planeArr[planeNum].addPoint(pointNum-3);
-planeArr[planeNum].addPoint(pointNum-4);
-planeArr[planeNum].addPoint(pointNum-1);
-planeNum++;
+    a.id=tag;
+    var c;
+    for(c=0;c<a.point.length;c++){
+        pointArr.push(a.point[c]);
+        pointVis.push(adjustPoint(pointArr[pointNum]));
+        pointNum++;
+    }
+    planeArr.push(new formList(context,color,tag));
+    planeArr[planeNum].addPoint(pointNum-1);
+    planeArr[planeNum].addPoint(pointNum-2);
+    planeArr[planeNum].addPoint(pointNum-3);
+    planeArr[planeNum].addPoint(pointNum-4);
+    planeArr[planeNum].addPoint(pointNum-1);
+    planeNum++;
 }
 
 
 function adjustPoint(a){
-var adj=new point3D(0,0,0);
-adj.x=a.x-cameraX;
-adj.y=a.y-cameraY;
-adj.z=a.z-cameraZ;
-var radius;
-var angle;
-radius=Math.sqrt(adj.x*adj.x+adj.z*adj.z);//x-axis
-if(adj.z==0)adj.z=1;
-angle=Math.atan(adj.x/adj.z)+losX*pi/180;
-if(adj.z<0){
-adj.z=-radius*Math.cos(angle);
-adj.x=-radius*Math.sin(angle);
-}else{
-adj.z=radius*Math.cos(angle);
-adj.x=radius*Math.sin(angle);
-}
-radius=Math.sqrt(adj.y*adj.y+adj.z*adj.z);//y-axis
-if(adj.z==0)adj.z=1;
-angle=Math.atan(adj.y/adj.z)+losY*pi/180;
-if(adj.z<0){
-adj.z=-radius*Math.cos(angle);
-adj.y=-radius*Math.sin(angle);
-}else{
-adj.z=radius*Math.cos(angle);
-adj.y=radius*Math.sin(angle);
-}
-if(adj.z==-focalLength)adj.z=-focalLength+1;
-if(adj.z<-focalLength){
-ratio=focalLength/(adj.z-focalLength);
-adj.x=Math.round(300+(1/ratio)*adj.x);
-adj.y=Math.round(300+(1/ratio)*adj.y);
-}
-else{
-ratio=focalLength/(adj.z+focalLength);
-adj.x=Math.round(300-ratio*adj.x);
-adj.y=Math.round(300-ratio*adj.y);
-}
-return adj;
+    var adj=new point3D(0,0,0);
+    adj.x=a.x-cameraX;
+    adj.y=a.y-cameraY;
+    adj.z=a.z-cameraZ;
+    var radius;
+    var angle;
+    radius=Math.sqrt(adj.x*adj.x+adj.z*adj.z);//x-axis
+    if(adj.z==0)
+        adj.z=1;
+    angle=Math.atan(adj.x/adj.z)+losX*pi/180;
+    if(adj.z<0){
+        adj.z=-radius*Math.cos(angle);
+        adj.x=-radius*Math.sin(angle);
+    }else{
+        adj.z=radius*Math.cos(angle);
+        adj.x=radius*Math.sin(angle);
+    }
+    radius=Math.sqrt(adj.y*adj.y+adj.z*adj.z);//y-axis
+    if(adj.z==0)
+        adj.z=1;
+    angle=Math.atan(adj.y/adj.z)+losY*pi/180;
+    if(adj.z<0){
+        adj.z=-radius*Math.cos(angle);
+        adj.y=-radius*Math.sin(angle);
+    }else{
+        adj.z=radius*Math.cos(angle);
+        adj.y=radius*Math.sin(angle);
+    }
+    if(adj.z==-focalLength)
+        adj.z=-focalLength+1;
+    if(adj.z<-focalLength){
+        ratio=focalLength/(adj.z-focalLength);
+        adj.x=Math.round(300+(1/ratio)*adj.x);
+        adj.y=Math.round(300+(1/ratio)*adj.y);
+    }
+    else{
+        ratio=focalLength/(adj.z+focalLength);
+        adj.x=Math.round(300-ratio*adj.x);
+        adj.y=Math.round(300-ratio*adj.y);
+    }
+    return adj;
 }
 
 
 
 function surfaceTest(){
-var c;
-var d;
-var f;
-var g;
-var diffx;
-var diffy;
-var diffz;
-var ratio;
-var theta;
-var aboveArr;
-var slopeX;
-var slopeZ;
-wasOnSurface=onSurface;
-onSurface=false;
-for(c=0;c<surfaceArr.length && onSurface==false;c++){
-if(!surfaceArr[c].active)onSurface=false;
-else if(surfaceArr[c].point[0].z<=cameraZ && surfaceArr[c].point[0].z+surfaceArr[c].depth>cameraZ && surfaceArr[c].point[0].x<cameraX && surfaceArr[c].point[0].x+surfaceArr[c].width>cameraX)onSurface=true;
-else onSurface=false;
-if(onSurface){
-surfaceArr[c].touched=true;
-var upper=cameraY-150;
-var lower=cameraY-150+speedy;
-var offsetX=cameraX-surfaceArr[c].point[0].x;
-var offsetZ=cameraZ-surfaceArr[c].point[0].z;
-
-slopeX=surfaceArr[c].slopeX;
-slopeZ=surfaceArr[c].slopeZ;
-var ySet=surfaceArr[c].point[0].y+offsetX*slopeX+offsetZ*slopeZ;
-
-if((upper>=ySet || wasOnSurface) && lower<=ySet){
-onSurface=true;
-transform(planeArr[sprite],0,ySet-cameraY+150,0);
-cameraY=ySet+150;
-forcey+=mass*grav;
-forcex-=mass*grav*Math.cos(Math.atan(slopeX))*Math.sin(Math.atan(slopeX));
-forcez-=mass*grav*Math.cos(Math.atan(slopeZ))*Math.sin(Math.atan(slopeZ));
-forcex+=appForce*Math.sin(losX*pi/180);
-forcez+=appForce*Math.cos(losX*pi/180);
-if(!wasOnSurface){
-speedy=0;
-}
-}else onSurface=false;
-}
-
-}
-
-return 0;
+    var c;
+    var d;
+    var f;
+    var g;
+    var diffx;
+    var diffy;
+    var diffz;
+    var ratio;
+    var theta;
+    var aboveArr;
+    var slopeX;
+    var slopeZ;
+    wasOnSurface=onSurface;
+    onSurface=false;
+    for(c=0;c<surfaceArr.length && onSurface==false;c++){
+        if(!surfaceArr[c].active)onSurface=false;
+        else if(surfaceArr[c].point[0].z<=cameraZ && surfaceArr[c].point[0].z+surfaceArr[c].depth>cameraZ && surfaceArr[c].point[0].x<cameraX && surfaceArr[c].point[0].x+surfaceArr[c].width>cameraX)onSurface=true;
+        else onSurface=false;
+        if(onSurface){
+            surfaceArr[c].touched=true;
+            var upper=cameraY-150;
+            var lower=cameraY-150+speedy;
+            var offsetX=cameraX-surfaceArr[c].point[0].x;
+            var offsetZ=cameraZ-surfaceArr[c].point[0].z;
+            
+            slopeX=surfaceArr[c].slopeX;
+            slopeZ=surfaceArr[c].slopeZ;
+            var ySet=surfaceArr[c].point[0].y+offsetX*slopeX+offsetZ*slopeZ;
+            
+            if((upper>=ySet || wasOnSurface) && lower<=ySet){
+                onSurface=true;
+                transform(planeArr[sprite],0,ySet-cameraY+150,0);
+                cameraY=ySet+150;
+                forcey+=mass*grav;
+                forcex-=mass*grav*Math.cos(Math.atan(slopeX))*Math.sin(Math.atan(slopeX));
+                forcez-=mass*grav*Math.cos(Math.atan(slopeZ))*Math.sin(Math.atan(slopeZ));
+                forcex+=appForce*Math.sin(losX*pi/180);
+                forcez+=appForce*Math.cos(losX*pi/180);
+                if(!wasOnSurface){
+                    speedy=0;
+                }
+            }else onSurface=false;
+        }
+    
+    }
+    
+    return 0;
 }
 
 function formList(context,color,tag){
-this.hidden=false;
-this.context=context;
-this.color=color;
-this.tag=tag;
-this.points=new Array(0);
-this.pLength=0;
-this.addPoint=function(a){
-this.points.push(a);
-this.pLength++;
-}
+    this.hidden=false;
+    this.context=context;
+    this.color=color;
+    this.tag=tag;
+    this.points=new Array(0);
+    this.pLength=0;
+    this.addPoint=function(a){
+        this.points.push(a);
+        this.pLength++;
+    }
 }
 
 function transform(a,x,y,z){
-var c;
-var d;
-var f;
-for(c=0;c<a.pLength;c++){
-f=false;
-for(d=0;d<c && !f;d++)f=(a.points[d]==a.points[c]);
-if(!f){
-pointArr[a.points[c]].x+=x;
-pointArr[a.points[c]].y+=y;
-pointArr[a.points[c]].z+=z;
-}
-}
+    var c;
+    var d;
+    var f;
+    for(c=0;c<a.pLength;c++){
+        f=false;
+        for(d=0;d<c && !f;d++)f=(a.points[d]==a.points[c]);
+        if(!f){
+            pointArr[a.points[c]].x+=x;
+            pointArr[a.points[c]].y+=y;
+            pointArr[a.points[c]].z+=z;
+        }
+    }
 }
 
 function rotate(a,thx,thy,thz,x,y,z){//th operator is an angle the object is rotated by
@@ -365,6 +348,42 @@ pointNum+=points.length;
 for(c=0;c<path.length;c++)planeArr[planeNum].addPoint(pointNum-points.length+parseInt(path[c]));
 }
 
+// Generate the configuration screen
+// Use a message collection
+function startConfig()
+{
+    playing = true;
+    inputpoint = 0;
+}
+function drawText(ctx, t, dt)
+{
+    ctx.globalCompositeOperation="source-over";
+    var width = ctx.canvas.width;
+    var height = ctx.canvas.height;
+    ctx.clearRect(0, 0, width, height);
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.textAlign = "center";
+    ctx.fillText(message[inputpoint], width / 2, height / 2);
+}
+var config = new Screen();
+config.on("open", startConfig, config);
+config.on("draw", drawText, config);
+
+function chooseKey(e)
+{
+    var cx = e.keyCode;
+    ctrls[inputpoint] = cx;
+    inputpoint++;
+    if(inputpoint >= message.length) {
+        this.close();
+        config.close();
+        init();
+    }
+}
+var configKeys = new Keyboard();
+configKeys.on("keydown", chooseKey, configKeys);
+
 function setup(){
     
     planeArr=new Array(0);
@@ -375,49 +394,28 @@ function setup(){
     planeNum=0;
     pointNum=0;
     
-    playing=true;
-    count=0;
-    
     speedx=0;
     speedy=0;
     speedz=0;
     
     time=0;
+    
     cameraX=410;
     cameraY=500;
     cameraZ=400;
+    
     losX=0;
     losY=5;
     inputpoint=0;
     if(!field)
         field=document.getElementById("space").getContext("2d");
-    field.globalCompositeOperation="source-over";
-    field.clearRect(0,0,600,600);
-    field.font="20px Arial";
-    field.fillStyle="#FFFFFF";
-    field.fillText("press the key for up",200,200);
-    document.onkeydown=function(e){
-        var cx=(window.event)?event.keyCode:e.keyCode;
-        if(inputpoint<ctrls.length) {
-            field.clearRect(200,100,300,300);
-            if(inputpoint + 1 < ctrls.length)
-                field.fillText(message[inputpoint+1],200,200);
-            else {
-                field.fillText("READY!!!",200,200);
-                field.font="14px Arial";
-                field.fillText("press any key",200,230);
-            }
-            ctrls[inputpoint]=cx;
-            inputpoint++;
-        }else{
-            init();
-        }
-    }
+    config.open(field);
+    configKeys.open();
     //other setup actions
 }
 window.addEventListener("load", setup, false);
 
-function init3D(){
+function init(){
     document.onkeydown=function(e){
         var cx=(window.event)?event.keyCode:e.keyCode;
         var c=0;
@@ -456,11 +454,6 @@ function init3D(){
     sprite=planeNum;
     planeNum++;
     recursive3D();
-}
-
-
-function init(){
-init3D();
 }
 
 function gameOver(a){
