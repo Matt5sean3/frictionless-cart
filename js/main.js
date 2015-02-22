@@ -1,67 +1,3 @@
-var KeyController = Backbone.Model.extend({
-    defaults: {
-    },
-    /**
-     * Subscribes to events from that keyboard
-     */
-    useKeyboard : function(){
-    }
-});
-
-/**
- * A game screen super-class
- * 
- * should perform most of the functionality for displaying things on screen
- */
-var Screen = Backbone.Model.extend({
-    defaults: function()
-    {
-        var ret = {
-            controller: new Keyboard()
-        };
-        return ret;
-    },
-    initialize: function()
-    {
-        this.down = this.trigger.bind(this, "keydown");
-        this.up = this.trigger.bind(this, "keyup");
-    },
-    draw: function()
-    {
-    },
-    open: function(ctx){
-        this.trigger("open");
-        
-        ctx.canvas.addEventListener("keydown", 
-            this.down, false);
-        
-        ctx.canvas.addEventListener("keyup", 
-            this.up, false);
-        
-        this.on("keydown", this.setKey, this);
-        this.on("keyup", this.unsetKey, this);
-    },
-    close: function(){
-        this.trigger("close");
-        ctx.canvas.removeEventListener("keydown", this.down, false);
-        ctx.canvas.removeEventListener("keyup", this.up, false);
-    },
-    setKey: function(e){
-        var keyState = this.get("key");
-        keyState[e.keyCode] = true;
-        this.set(keyState);
-    },
-    unsetKey: function(e){
-        var keyState = this.get("key");
-        keySate[e.keyCode] = false;
-        this.set(keyState);
-    },
-    /**
-     * Subscribes to events on a given controller
-     */
-    useController: function(){
-    }
-});
 
 var ConfigurationScreen = Screen.extend({
     initialize: function(){
@@ -118,12 +54,15 @@ message[2]="press the key for left";
 message[3]="press the key for right";
 
 var onSurface=true;
+
 var speedx=0;
 var speedy=0;
 var speedz=0;
+
 var forcex=0;
 var forcey=0;
 var forcez=0;
+
 var appForce=0;
 var xRotSpeed=0;
 var sprite=0;
@@ -427,91 +366,96 @@ for(c=0;c<path.length;c++)planeArr[planeNum].addPoint(pointNum-points.length+par
 }
 
 function setup(){
-if(playing==true)window.scrollBy(0,250)
-
-planeArr=new Array(0);
-pointArr=new Array(0);
-pointVis=new Array(0);
-surfaceArr=new Array(0);
-surfaceNum=0;
-planeNum=0;
-pointNum=0;
-
-playing=true;
-count=0;
-speedx=0;
-speedy=0;
-speedz=0;
-time=0;
-cameraX=410;
-cameraY=500;
-cameraZ=400;
-losX=0;
-losY=5;
-inputpoint=0;
-if(!field)field=document.getElementById("space").getContext("2d");
-field.globalCompositeOperation="source-over";
-field.clearRect(0,0,600,600);
-field.font="20px Arial";
-field.fillStyle="#FFFFFF";
-field.fillText("press the key for up",200,200);
-document.onkeydown=function(e){
-var cx=(window.event)?event.keyCode:e.keyCode;
-if(inputpoint<ctrls.length){
-field.clearRect(200,100,300,300);
-if(inputpoint+1<ctrls.length)field.fillText(message[inputpoint+1],200,200);
-else{
-field.fillText("READY!!!",200,200);
-field.font="14px Arial";
-field.fillText("press any key",200,230);
-}
-ctrls[inputpoint]=cx;
-inputpoint++;
-}else{
-init();
-}
-}
-//other setup actions
+    
+    planeArr=new Array(0);
+    pointArr=new Array(0);
+    pointVis=new Array(0);
+    surfaceArr=new Array(0);
+    surfaceNum=0;
+    planeNum=0;
+    pointNum=0;
+    
+    playing=true;
+    count=0;
+    
+    speedx=0;
+    speedy=0;
+    speedz=0;
+    
+    time=0;
+    cameraX=410;
+    cameraY=500;
+    cameraZ=400;
+    losX=0;
+    losY=5;
+    inputpoint=0;
+    if(!field)
+        field=document.getElementById("space").getContext("2d");
+    field.globalCompositeOperation="source-over";
+    field.clearRect(0,0,600,600);
+    field.font="20px Arial";
+    field.fillStyle="#FFFFFF";
+    field.fillText("press the key for up",200,200);
+    document.onkeydown=function(e){
+        var cx=(window.event)?event.keyCode:e.keyCode;
+        if(inputpoint<ctrls.length) {
+            field.clearRect(200,100,300,300);
+            if(inputpoint + 1 < ctrls.length)
+                field.fillText(message[inputpoint+1],200,200);
+            else {
+                field.fillText("READY!!!",200,200);
+                field.font="14px Arial";
+                field.fillText("press any key",200,230);
+            }
+            ctrls[inputpoint]=cx;
+            inputpoint++;
+        }else{
+            init();
+        }
+    }
+    //other setup actions
 }
 window.addEventListener("load", setup, false);
 
 function init3D(){
-document.onkeydown=function(e){
-var cx=(window.event)?event.keyCode:e.keyCode;
-var c=0;
-while(c<ctrls.length && ctrls[c]!=cx)c++;
-if(c<keys.length)keys[c]=true;
-}
-document.onkeyup=function(e){
-var cx=(window.event)?event.keyCode:e.keyCode;
-var c=0;
-while(c<ctrls.length && ctrls[c]!=cx)c++;
-if(c<keys.length)keys[c]=false;
-}
-var d;
-var c;
-for(c=0;c<9;c++){
-surfaceArr.push(new surface(0,c*500,0,500,500,0,0,"xxx"));
-surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
-surfaceNum++;
-
-surfaceArr.push(new surface(5000,c*500,0,500,500,0,0,"xxx"));
-surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
-surfaceNum++;
-}
-for(d=0;d<11;d++){
-surfaceArr.push(new surface(d*500,-500,0,500,500,0,0,"xxx"));
-surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
-surfaceNum++;
-surfaceArr.push(new surface(d*500,c*500,0,500,500,0,0,"xxx"));
-surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
-surfaceNum++;
-}
-
-drawSprite(fighter,"#FFFFFF","player",new point3D(cameraX,cameraY,cameraZ));
-sprite=planeNum;
-planeNum++;
-recursive3D();
+    document.onkeydown=function(e){
+        var cx=(window.event)?event.keyCode:e.keyCode;
+        var c=0;
+        while(c<ctrls.length && ctrls[c]!=cx)c++;
+        if(c<keys.length)keys[c]=true;
+    }
+    document.onkeyup=function(e){
+        var cx=(window.event)?event.keyCode:e.keyCode;
+        var c=0;
+        while(c<ctrls.length && ctrls[c]!=cx)c++;
+        if(c<keys.length)keys[c]=false;
+    }
+    var d;
+    var c;
+    
+    // This is how th surfaces are configured right now
+    for(c=0;c<9;c++){
+        surfaceArr.push(new surface(0,c*500,0,500,500,0,0,"xxx"));
+        surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
+        surfaceNum++;
+        
+        surfaceArr.push(new surface(5000,c*500,0,500,500,0,0,"xxx"));
+        surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
+        surfaceNum++;
+    }
+    for(d=0;d<11;d++){
+        surfaceArr.push(new surface(d*500,-500,0,500,500,0,0,"xxx"));
+        surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
+        surfaceNum++;
+        surfaceArr.push(new surface(d*500,c*500,0,500,500,0,0,"xxx"));
+        surfaceToPlane(field,surfaceArr[surfaceNum],"#00FF00",surfaceNum);
+        surfaceNum++;
+    }
+    
+    drawSprite(fighter,"#FFFFFF","player",new point3D(cameraX,cameraY,cameraZ));
+    sprite=planeNum;
+    planeNum++;
+    recursive3D();
 }
 
 
